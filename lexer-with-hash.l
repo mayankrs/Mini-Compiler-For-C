@@ -168,11 +168,11 @@ int main(){
     }
     yyin=fopen("test-1.c","r");
     yylex();
-    printf("\n\nSYMBOL TABLE\n");
+    printf("\n\nSYMBOL TABLE\n\n");
     
     print();
 
-    printf("\n\nConstant Table\n\n");
+    printf("\n\nCONSTANT TABLE\n\n");
     print2();
 }
 
