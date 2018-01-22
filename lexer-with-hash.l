@@ -133,21 +133,18 @@ OR \|
 %%
 [ \n\t] ;
 \".*\"|\'.*\' {printf("%s \t- STRING CONSTANT\n", yytext); insert2(yytext,"STRING CONSTANT");}
-; {printf("%s \t- SEMICOL DELIMITER\n", yytext); insert(yytext, "SEMICOL DELIMITER");}
-, {printf("%s \t- COMM DELIMITER\n", yytext); insert(yytext, "COMM DELIMITER");}
-\{ {printf("%s \t- OPENING BRACES\n", yytext); insert(yytext, "OPENING BRACES");}
-\} {printf("%s \t- CLOSING BRACES\n", yytext); insert(yytext, "CLOSING BRACES");}
-\( {printf("%s \t- OPENING BRACKETS\n", yytext); insert(yytext, "OPENING BRACKETS");}
-\) {printf("%s \t- CLOSING BRACKETS\n", yytext); insert(yytext, "CLOSING BRACKETS");}
+; {printf("%s \t- SEMICOL DELIMITER\n", yytext);}
+, {printf("%s \t- COMM DELIMITER\n", yytext);}
+\{ {printf("%s \t- OPENING BRACES\n", yytext);}
+\} {printf("%s \t- CLOSING BRACES\n", yytext);}
+\( {printf("%s \t- OPENING BRACKETS\n", yytext);}
+\) {printf("%s \t- CLOSING BRACKETS\n", yytext);}
 # {printf("%s \t- PREPROCESSOR\n", yytext); insert(yytext, "PREPROCESSOR");}
-printf {printf("%s \t- PRINT\n", yytext); insert(yytext, "PRINT");}
-\" {printf("%s \t- DQOUTE\n", yytext); insert(yytext, "DQOUTE");}
-\' {printf("%s \t- SQOUTE\n", yytext); insert(yytext, "SQOUTE");}
-\\ {printf("%s \t- FSLASH\n", yytext); insert(yytext, "FSLASH");}
-\. {printf("%s \t- DOT DELIMITER\n", yytext); insert(yytext, "DOT DELIMITER");}
-\/\/.* {printf("%s \t- SINGLE LINE COMMENT\n", yytext); insert(yytext, "SINGLE LINE COMMENT");}
+\\ {printf("%s \t- FSLASH\n", yytext);}
+\. {printf("%s \t- DOT DELIMITER\n", yytext);}
+\/\/.* {printf("%s \t- SINGLE LINE COMMENT\n", yytext);}
 
-"/*"([^*]|\*+[^*/])*\*+"/" {printf("%s \t- MULTI LINE COMMENT\n", yytext); insert(yytext, "MULTI LINE COMMENT");}
+"/*"([^*]|\*+[^*/])*\*+"/" {printf("%s \t- MULTI LINE COMMENT\n", yytext);}
 
 auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|main {printf("%s \t- KEYWORD\n", yytext); insert(yytext, "KEYBOARD");}
 
@@ -155,9 +152,9 @@ auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for
 
 [1-9][0-9]*|0 {printf("%s \t- NUMBER CONSTANT\n", yytext); insert2(yytext, "NUMBER CONSTANT");}
 
-{PLUS}|{MINUS}|{MULT}|{DIV}|{EQ}|{LEQ}|{GEQ}|{LES}|{GRE}|{REM}|{AND}|{OR} {printf("%s \t- OPERATOR\n", yytext); insert(yytext, "OPERATOR");} 
+{PLUS}|{MINUS}|{MULT}|{DIV}|{EQ}|{LEQ}|{GEQ}|{LES}|{GRE}|{REM}|{AND}|{OR} {printf("%s \t- OPERATOR\n", yytext);} 
 
-(.?) {printf("%s \t- INVALID\n", yytext); insert(yytext, "INVALID");}
+(.?) {printf("%s \t- INVALID\n", yytext);}
 %%
 
 int main(){
