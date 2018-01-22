@@ -18,7 +18,7 @@ int main(){
 
     else printf("Bug3\n");
 
-    int ><-_-= 2;
+    int @<-_-= 2;
 
     //This test case contains nested conditional statement,Array and print statement
     //Also there is an error in declaring integer variable which does not match any regular expression.
