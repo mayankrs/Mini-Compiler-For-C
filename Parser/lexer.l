@@ -114,29 +114,8 @@
         }
     }
 
-    int line = 0;
+    int line = 1;
 %}
-
-NE !=
-LE <=
-GE >=
-EQ ==
-E =
-LT <
-GT >
-INC \+\+
-DEC \-\-
-PEQ \+=
-MEQ \-=
-PLUS \+
-MINUS \-
-MULT \*
-DIV \/
-REM %
-BAND &
-BOR \|
-AND &&
-OR \|\|
 
 %%
 [ \t] ;
@@ -156,25 +135,27 @@ else {return ELSE;}
 int {return INT;}
 char {return CHAR;}
 void {return VOID;}
-LE {return LE;}
-GE {return GE;}
-LT {return LT;}
-GT {return GT;}
-EQ {return EQ;}
-NE {return NE;}
-INC {return INC;}
-DEC {return DEC;}
-MEQ {return MEQ;}
-PEQ {return PEQ;}
-BAND {return BAND;}
-BOR {return BOR;}
-AND {return AND;}
-OR {return OR;}
-PLUS {return PLUS;}
-MINUS {return MINUS;}
-DIV {return DIV;}
-MULT {return MULT;}
-E {return E;}
+\<\= {return LE;}
+\>\= {return GE;}
+\< {return LT;}
+\> {return GT;}
+\=\= {return EQ;}
+\!\= {return NE;}
+\+\+ {return INC;}
+\-\- {return DEC;}
+\-\= {return MEQ;}
+\+\= {return PEQ;}
+\*\= {return MUEQ;}
+\/\= {return DEQ;}
+\& {return BAND;}
+\| {return BOR;}
+\&\& {return AND;}
+\|\| {return OR;}
+\+ {return PLUS;}
+\- {return MINUS;}
+\/ {return DIV;}
+\* {return MULT;}
+\= {return E;}
 
 [a-zA-Z_]([a-z|A-Z]|[0-9]|_)* {insert(yytext, "IDENTIFIER"); return ID;}
 
