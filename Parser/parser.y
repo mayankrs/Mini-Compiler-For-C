@@ -19,7 +19,6 @@
 %%
 start:      INCLUDE start
             | INCLUDE stmt
-            |stmt
             ;
  
 type:       INT
@@ -34,8 +33,8 @@ stmt:       whileloop
             | funccall';'
             | assignment';'
             | declaration';'
-            |';'
-            |expr';'
+            | ';'
+            | expr';'
             ;
  
 comparison1: '>='
@@ -121,8 +120,8 @@ whileloop:  WHILE '(' expr ')' stmt
  
 forloop:    FOR '(' expr ';' expr ';' expr ')' stmt
             | FOR '(' expr ';' expr ';' expr ')' stmtblock
-            |FOR '(' assignment ';' expr ';' expr ')' stmt
-            |FOR '(' assignment ';' expr ';' expr ')' stmtblock 
+            | FOR '(' assignment ';' expr ';' expr ')' stmt
+            | FOR '(' assignment ';' expr ';' expr ')' stmtblock 
             ;
  
 ifstmt:     IF '(' expr ')' stmtblock elsestmt
@@ -135,7 +134,7 @@ elsestmt:   ELSE ifstmt
             |  
             ;
 %%
- #include"lex.yy.c"
+#include"lex.yy.c"
 void yyerror(char *s)
 {
     flag=1;
