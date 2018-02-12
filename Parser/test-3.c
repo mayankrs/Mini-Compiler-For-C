@@ -1,22 +1,22 @@
 #include<stdio.h>
 
 int main(){
-    char s[]="Welcome!!";
-    char S[20];
+    int i = 10;
+    int y = 100;
+    int b = 1000;
 
-    int p;
-    if(s[0]=='W'){
-        if(s[1]=='e'){
-            if(s[2]=='l'){
-                printf("Welcome!!");
-            }
-
-            else printf("Bug1\n");
+    if (i <= y)
+    {
+        if (y<b)
+            printf("I is smallest");
+        else
+        {
+            if(i<b)
+                printf("I is smallest");
+            else
+                printf("I is not smallest");
         }
-        else printf("Bug2\n");
     }
-
-    else printf("Bug3\n");
 
     //This test case contains nested conditional statement,Array and print statement
     //Syntax error included. } missing
