@@ -8,7 +8,7 @@
  
 %token ID NUM STRING FOR WHILE IF ELSE
 %token INT CHAR VOID INCLUDE RETURN
-%token INC DEC PEQ MEQ
+%token INC DEC PEQ MEQ DEQ MUEQ
  
 %right E
 %left AND OR BOR BAND
@@ -18,7 +18,7 @@
  
 %%
 start:      INCLUDE start
-            | INCLUDE stmt
+            | INCLUDE stmtlist
             ;
  
 type:       INT
@@ -35,47 +35,63 @@ stmt:       whileloop
             | declaration';'
             | ';'
             | expr';'
+            | RETURN';'
+            | RETURN expr';'
             ;
  
-comparison1: '>='
-            | '<='
-            | '<'
-            | '>'
+comparison1:GE
+            | LE
+            | LT
+            | GT
             ;
  
-comparison2:'=='
-            | '!='
+comparison2:EQ
+            | NE
             ;
  
-op1:        '*'
-            | '/'
+op1:        MULT
+            | DIV
             ;
  
-op2:        '+'
-            | '-'
+op2:        PLUS
+            | MINUS
             ;
  
-unary:      '++'
-            | '--'
-            | '-'
+unary:      INC
+            | DEC
+            ;
+
+op3:        PEQ
+            | E
+            | MEQ
+            | MUEQ
+            | DEQ
             ;
  
-expr:       expr '||' expr
-            | expr '&&' expr
-            | expr '|' expr
-            | expr '&' expr
+expr:       expr OR expr
+            | expr AND expr
+            | expr BOR expr
+            | expr BAND expr
             | expr comparison2 expr
             | expr comparison1 expr
             | expr op2 expr
             | expr op1 expr
             | unary expr
+            | expr unary
+            | MINUS expr
             | '('expr')'
             | ID
             | NUM 
             | funccall
+            | STRING
             ;
  
-assignment: ID '=' expr 
+expr1:      expr
+            | assignment
+            |  
+            ;
+            
+assignment: ID op3 expr 
             ;
  
 declaration:type ID 
@@ -90,11 +106,11 @@ stmtlist:   stmt stmtlist
             ;
  
 arguement:  ID
-            |'&'ID
+            | BAND ID
             | NUM
             | STRING
             | ID',' arguement
-            |'&'ID',' arguement
+            | BAND ID',' arguement
             | NUM',' arguement
             | STRING',' arguement
             ;
@@ -118,10 +134,8 @@ whileloop:  WHILE '(' expr ')' stmt
             | WHILE '(' expr ')' stmtblock
             ;
  
-forloop:    FOR '(' expr ';' expr ';' expr ')' stmt
-            | FOR '(' expr ';' expr ';' expr ')' stmtblock
-            | FOR '(' assignment ';' expr ';' expr ')' stmt
-            | FOR '(' assignment ';' expr ';' expr ')' stmtblock 
+forloop:    FOR '(' expr1 ';' expr1 ';' expr1 ')' stmt
+            | FOR '(' expr1 ';' expr1 ';' expr1 ')' stmtblock
             ;
  
 ifstmt:     IF '(' expr ')' stmtblock elsestmt
