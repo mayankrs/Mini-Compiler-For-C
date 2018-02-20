@@ -120,7 +120,6 @@ parameter:  type ID
  
 paramlist:  parameter',' paramlist
             | parameter
-            |
             ;
  
 funccall:   ID'('')'
@@ -142,8 +141,7 @@ ifstmt:     IF '(' expr ')' stmtblock elsestmt
             | IF '(' expr ')' stmt elsestmt
             ;
  
-elsestmt:   ELSE ifstmt
-            | ELSE stmtblock
+elsestmt:   ELSE stmtblock
             | ELSE stmt
             |  
             ;
