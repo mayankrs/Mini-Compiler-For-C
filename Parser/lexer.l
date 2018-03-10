@@ -28,7 +28,7 @@
         return val;
     }
 
-    void insert(char *arg1,char *arg2)
+    void inserttype(char *arg1,char *arg2)
     {
         int l1=strlen(arg1);
         int l2=strlen(arg2);
@@ -115,6 +115,8 @@
     }
 
     int line = 1;
+    char curid[20];
+    char curtype[20];
 %}
 
 %%
@@ -132,8 +134,8 @@ for {return FOR;}
 while {return WHILE;}
 if {return IF;}
 else {return ELSE;}
-int {return INT;}
-char {return CHAR;}
+int {strcpy(curtype,yytext);return INT;}
+char {strcpy(curtype,yytext);return CHAR;}
 void {return VOID;}
 \<\= {return LE;}
 \>\= {return GE;}
@@ -157,7 +159,7 @@ void {return VOID;}
 \* {return MULT;}
 \= {return E;}
 
-[a-zA-Z_]([a-z|A-Z]|[0-9]|_)* {insert(yytext, "IDENTIFIER"); return ID;}
+[a-zA-Z_]([a-z|A-Z]|[0-9]|_)* {strcpy(curid,yytext); return ID;}
 
 [1-9][0-9]*|0 {insert2(yytext, "NUMBER CONSTANT"); return NUM;}
 

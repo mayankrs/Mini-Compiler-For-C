@@ -1,5 +1,6 @@
 %{
     void yyerror(char* s);
+    void ins();
     #include<stdio.h>
     #include<stdlib.h>
     #include<ctype.h>
@@ -94,7 +95,7 @@ expr1:      expr
 assignment: ID op3 expr 
             ;
  
-declaration:type ID 
+declaration:type ID {ins();}
             | type assignment
             ;
  
@@ -120,6 +121,7 @@ parameter:  type ID
  
 paramlist:  parameter',' paramlist
             | parameter
+            |
             ;
  
 funccall:   ID'('')'
@@ -152,12 +154,17 @@ void yyerror(char *s)
     flag=1;
     printf("%d : %s %s\n", line, s, yytext);
 }
+
+void ins(){
+    insert(curid,curtype);
+}
  
 int main()
 {
     yyin=fopen("test-1.c","r");
     yyparse();
 
+    print();
     if(!flag){
         printf("Parsing Successful\n");
     }
