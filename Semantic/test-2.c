@@ -5,6 +5,10 @@ int fun(int x){
     return x*x;
 }
 
+int fu1(int a,int b){
+    return a+b;
+}
+
 int main(){
     int a;
     int b;
@@ -23,6 +27,7 @@ int main(){
     g=a&b;
     h=a*(a+b);
     h=a*a+b*c;
-    h=fun(b);
+    fun(d);
+    fu1(a,b);
     
 }

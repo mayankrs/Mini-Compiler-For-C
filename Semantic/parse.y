@@ -11,6 +11,7 @@
 	void checkscope();
 	char curfuntype[105];
 	char getfirst(char *s);
+	char *getprev();
 	char tmptype[105];
 	char gettype(char *s);
 
@@ -21,7 +22,7 @@
 	void deletedata(int nest);
 %}
 
-%token INT CHAR VOID FOR WHILE IF ELSE BREAK RETURN CONTINUE
+%token INT CHAR VOID FOR WHILE IF ELSE BREAK RETURN CONTINUE LP RP
 %token ID STRING NUM INCLUDE
 
 %right EQ PEQ MEQ MUEQ DEQ
@@ -80,7 +81,7 @@ expr:		expr OR expr
 			| DEC expr
 			| expr INC
 			| expr DEC
-			| '(' expr ')'
+			| LP expr RP
 			| ID                            {checkscope();}
 			| STRING
 			| NUM
@@ -120,33 +121,33 @@ argument:	BAND ID {checkscope();}
 			|STRING {tmptype[tmpargs]='c';}
 			;
 			
-parameter:	type ID      				 {curfuntype[curargs]=getfirst(getcurrtype());insert(getcurrid(), getcurrtype(), 0, nestval,curargs,curfuntype);}                   
+parameter:	type ID   {curfuntype[curargs]=getfirst(getcurrtype());insert(getcurrid(), getcurrtype(), 0, nestval,curargs,curfuntype);}                   
 			;
 
 paramlist: 	parameter',' {curargs++;} paramlist
 			| parameter {curargs++;}  
 			;
 
-funccall:	ID '(' {printf("currid %s\n",getcurrid());strcpy(lastcallfun,getcurrid());checkscope();} argumentlist ')'{checkfun(lastcallfun,tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");}	
-			| ID '('')' {checkfun(getcurrid(),tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");}
+funccall:	ID LP {strcpy(lastcallfun,getprev());checkscope();} argumentlist RP{checkfun(lastcallfun,tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");}	
+			| ID LP  {checkfun(getcurrid(),tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");} RP
 			;
 
-funcdef:	type ID '(' {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist ')' {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");} stmtblock  {deletedata(nestval); nestval--;} 
-			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");}')' stmtblock          
+funcdef:	type ID LP {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist RP {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");} stmtblock  {deletedata(nestval); nestval--;} 
+			| type ID  LP{insert(getcurrid(), getcurrtype(), 1, nestval,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");}RP stmtblock          
 			;
 			
-whileloop: 	WHILE '(' expr ')' stmtblock
-			| WHILE '(' expr ')' stmt
+whileloop: 	WHILE LP expr RP stmtblock
+			| WHILE LP expr RP stmt
 			;
 
-forloop:	FOR '(' expr1 ';' expr1 ';' expr1 ')' stmtblock
-			| FOR '(' expr1 ';' expr1 ';' expr1 ')' stmt 
+forloop:	FOR LP expr1 ';' expr1 ';' expr1 RP stmtblock
+			| FOR LP expr1 ';' expr1 ';' expr1 RP stmt 
 			;
 			
-ifstmt:		IF '(' expr ')' stmtblock elsestmt
-			| IF '(' expr ')' stmt elsestmt
-			| IF '(' expr ')' stmtblock
-			| IF '(' expr ')' stmt
+ifstmt:		IF LP expr RP stmtblock elsestmt
+			| IF LP expr RP stmt elsestmt
+			| IF LP expr RP stmtblock
+			| IF LP expr RP stmt
 			;
 
 elsestmt:	ELSE stmtblock
@@ -177,6 +178,10 @@ char gettype(char *s){
 	}
 }
 
+char *getprev(){
+	return previd;
+}
+
 char getfirst(char *s){
 	if(strcmp(s,"int")==0)
 	return 'i';
@@ -193,11 +198,11 @@ char getfirst(char *s){
 void checkfun(char *funname,int numargs,char *argtype){
 	int i,flag=0;
 
-	printf("Funtype %s %s %d\n",argtype, funname, numargs);
+//	printf("Funtype %s %s %d\n",argtype, funname, numargs);
 
 	for (i=0;i<1001;i++){
 		if(strcmp(funname,table[i].symbol)==0){
-			printf("Here funtype is %s\n",table[i].symbol);
+//			printf("Here funtype is %s\n",table[i].symbol);
 			if(table[i].isfunc==1  && strcmp(argtype,table[i].paramtype)==0){
 				flag=1;
 			}

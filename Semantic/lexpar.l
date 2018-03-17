@@ -3,7 +3,7 @@
 	#include<string.h>
 	int line = 1;	
 	char currtype[100];
-	char currid[100];
+	char currid[100],previd[105];
 	
 	struct hashtable
 	{
@@ -144,6 +144,8 @@ continue return CONTINUE;
 \* return MULT;
 \/ return DIV;
 \% return MOD;
+"(" return LP;
+")" return RP;
 
 \+\+ return INC;
 \-\- return DEC;
@@ -167,7 +169,7 @@ continue return CONTINUE;
 \& return BAND;
 \&\& return AND;
 
-[a-zA-Z_][a-zA-z0-9_]* {strcpy(currid, yytext); return ID;}
+[a-zA-Z_][a-zA-z0-9_]* {strcpy(previd,currid);strcpy(currid, yytext); return ID;}
 ([1-9][0-9]*)|[0] return NUM;
 \".*\"|\'.*\' return STRING;
 
