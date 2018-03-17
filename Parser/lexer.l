@@ -5,6 +5,7 @@
     struct hashtable{
         char name[105];
         char type[105];
+        char value[105];
         int len;
     }table[1005];
 
@@ -56,6 +57,15 @@
         strcpy(table[pos].name,arg1);
         strcpy(table[pos].type,arg2);
         table[pos].len=strlen(arg1);
+    }
+
+    void insertvalue(char *arg1,char *arg2){
+        int i;
+        for (i=0;i<1001;i++){
+            if(strcmp(table[i].name,arg1)==0){
+                table[i].value=arg2;
+            }
+        }
     }
 
     void insert2(char *arg1,char *arg2)
@@ -117,13 +127,14 @@
     int line = 1;
     char curid[20];
     char curtype[20];
+    char curval[100];
 %}
 
 %%
 [ \t] ;
 [ \n] {line = line + 1;}
 
-\".*\"|\'.*\' {insert2(yytext,"STRING CONSTANT"); return STRING;}
+\".*\"|\'.*\' {strcpy(curval,yytext);insert2(yytext,"STRING CONSTANT"); return STRING;}
 "#include"(.*) {return INCLUDE;}
 
 \/\/.* ;
@@ -161,7 +172,7 @@ void {return VOID;}
 
 [a-zA-Z_]([a-z|A-Z]|[0-9]|_)* {strcpy(curid,yytext); return ID;}
 
-[1-9][0-9]*|0 {insert2(yytext, "NUMBER CONSTANT"); return NUM;}
+[1-9][0-9]*|0 {strcpy(curval,yytext);insert2(yytext, "NUMBER CONSTANT"); return NUM;}
 
 . return yytext[0];
 

@@ -3,10 +3,15 @@
 	#include<stdio.h>
 	#include<string.h>
 	int flag = 0;
+	int curargs=0;
 	int nestval = 0;
+	char lastfun[105],funtype[105];
+	char *getcurrid();
+	char *getcurrtype();
+	void checkscope();
 	
-	void update(char *s, char *t);
-	void insert(char *name, char *type, int flag, int nest);
+	void insert(char *name, char *type, int flag, int nest,int numargs);
+
 	void deletedata(int nest);
 %}
 
@@ -88,7 +93,7 @@ assignment: ID{checkscope();} EQ expr
 			| ID{checkscope();} DEQ expr
 			;
 
-declaration:type ID                         {insert(currid, currtype, 0, nestval);}     
+declaration:type ID                         {insert(getcurrid(), getcurrtype(), 0, nestval,curargs);}     
 			| type assignment     
 			;
 			
@@ -107,19 +112,19 @@ argument:	BAND ID {checkscope();}
 			| expr
 			;
 			
-parameter:	type ID      				 {insert(currid, currtype, 0, nestval);}                   
+parameter:	type ID      				 {insert(getcurrid(), getcurrtype(), 0, nestval,curargs);}                   
 			;
 
-paramlist: 	parameter',' paramlist
-			| parameter
+paramlist: 	parameter',' {curargs++;} paramlist
+			| parameter {curargs++;}  
 			;
 
 funccall:	ID '(' {checkscope();} argumentlist ')'		
 			| ID '('')'         
 			;
 
-funcdef:	type ID '(' {insert(currid, currtype, 1, nestval); nestval++;} paramlist ')'stmtblock  {deletedata(nestval); nestval--;} 
-			| type ID  '('{insert(currid, currtype, 1, nestval);}')' stmtblock          
+funcdef:	type ID '(' {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist ')' {insert(lastfun,funtype,1,nestval-1,curargs);curargs=0;} stmtblock  {deletedata(nestval); nestval--;} 
+			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval,curargs);curargs=0;}')' stmtblock          
 			;
 			
 whileloop: 	WHILE '(' expr ')' stmtblock
@@ -145,6 +150,14 @@ void yyerror(char *s)
 {
 	flag = 1;
 	printf("%d - %s: %s\n", line, yytext, s);
+}
+
+char *getcurrid(){
+	return currid;
+}
+
+char *getcurrtype(){
+	return currtype;
 }
 
 void checkscope()

@@ -1,10 +1,13 @@
 %{
     void yyerror(char* s);
     void ins();
+    void insVal();
+    int convert(char *s);
     #include<stdio.h>
     #include<stdlib.h>
     #include<ctype.h>
     int flag=0;
+
 %}
  
 %token ID NUM STRING FOR WHILE IF ELSE
@@ -92,11 +95,11 @@ expr1:      expr
             |  
             ;
             
-assignment: ID op3 expr 
+assignment: ID op3 expr {update(curid,)}
             ;
  
 declaration:type ID {ins();}
-            | type assignment
+            | type assignment {ins();insVal();}
             ;
  
 stmtblock:  '{' stmtlist '}'
@@ -156,7 +159,21 @@ void yyerror(char *s)
 }
 
 void ins(){
-    insert(curid,curtype);
+    inserttype(curid,curtype);
+}
+
+void insVal(){
+    insertValue(curid,curval);
+}
+
+int convert(char *s){
+    int l=strlen(s);
+
+    int val=0;
+    for (int i=0;i<l;i++){
+        val=10*val+(int)(s[i]-'0');
+    }
+    return val;
 }
  
 int main()
