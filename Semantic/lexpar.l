@@ -49,7 +49,7 @@
 		return val;
 	}
 	
-	void insert(char* name, char* type, int flag, int nest,int numargs)
+	void insert(char* name, char* type, int flag, int nest,int numargs,char *argtype)
 	{
 		int l1 = strlen(name);
 		int l2 = strlen(type);
@@ -62,6 +62,7 @@
 			table[v].nesting = nest;
 			table[v].len = l1;
 			table[v].params=numargs;
+			strcpy(table[v].paramtype,argtype);
 			return;
 		}
 		
@@ -84,6 +85,7 @@
 		table[pos].isfunc = flag;
 		table[pos].nesting = nest;
 		table[pos].len = l1;
+		strcpy(table[pos].paramtype,argtype);
 		table[pos].params=numargs;
 	}
 	
@@ -94,7 +96,7 @@
 		{
 			if (table[i].len == 0)
 				continue;
-			printf("%s - %s -%d\n", table[i].symbol, table[i].type,table[i].params);
+			printf("%s - %s -%d %s\n", table[i].symbol, table[i].type,table[i].params,table[i].paramtype);
 		}
 	}
 	

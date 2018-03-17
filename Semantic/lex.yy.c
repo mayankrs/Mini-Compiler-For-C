@@ -482,7 +482,7 @@ char *yytext;
 		return val;
 	}
 	
-	void insert(char* name, char* type, int flag, int nest,int numargs)
+	void insert(char* name, char* type, int flag, int nest,int numargs,char *argtype)
 	{
 		int l1 = strlen(name);
 		int l2 = strlen(type);
@@ -495,6 +495,7 @@ char *yytext;
 			table[v].nesting = nest;
 			table[v].len = l1;
 			table[v].params=numargs;
+			strcpy(table[v].paramtype,argtype);
 			return;
 		}
 		
@@ -517,6 +518,7 @@ char *yytext;
 		table[pos].isfunc = flag;
 		table[pos].nesting = nest;
 		table[pos].len = l1;
+		strcpy(table[pos].paramtype,argtype);
 		table[pos].params=numargs;
 	}
 	
@@ -527,7 +529,7 @@ char *yytext;
 		{
 			if (table[i].len == 0)
 				continue;
-			printf("%s - %s -%d\n", table[i].symbol, table[i].type,table[i].params);
+			printf("%s - %s -%d %s\n", table[i].symbol, table[i].type,table[i].params,table[i].paramtype);
 		}
 	}
 	
@@ -550,7 +552,7 @@ char *yytext;
 		}
 	}
 	
-#line 554 "lex.yy.c"
+#line 556 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -712,9 +714,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 122 "lexpar.l"
+#line 124 "lexpar.l"
 
-#line 718 "lex.yy.c"
+#line 720 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -799,220 +801,220 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 123 "lexpar.l"
+#line 125 "lexpar.l"
 ;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 124 "lexpar.l"
+#line 126 "lexpar.l"
 line += 1;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 125 "lexpar.l"
+#line 127 "lexpar.l"
 return INCLUDE;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 126 "lexpar.l"
+#line 128 "lexpar.l"
 ;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 127 "lexpar.l"
+#line 129 "lexpar.l"
 ;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 129 "lexpar.l"
+#line 131 "lexpar.l"
 {strcpy(currtype, yytext); return INT;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 130 "lexpar.l"
+#line 132 "lexpar.l"
 {strcpy(currtype, yytext); return CHAR;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 131 "lexpar.l"
+#line 133 "lexpar.l"
 {strcpy(currtype, yytext); return VOID;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 132 "lexpar.l"
+#line 134 "lexpar.l"
 return IF;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 133 "lexpar.l"
+#line 135 "lexpar.l"
 return ELSE;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 134 "lexpar.l"
+#line 136 "lexpar.l"
 return FOR;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 135 "lexpar.l"
+#line 137 "lexpar.l"
 return WHILE;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 136 "lexpar.l"
+#line 138 "lexpar.l"
 return BREAK;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 137 "lexpar.l"
+#line 139 "lexpar.l"
 return RETURN;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 138 "lexpar.l"
+#line 140 "lexpar.l"
 return CONTINUE;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 140 "lexpar.l"
+#line 142 "lexpar.l"
 return PLUS;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 141 "lexpar.l"
+#line 143 "lexpar.l"
 return MINUS;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 142 "lexpar.l"
+#line 144 "lexpar.l"
 return MULT;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 143 "lexpar.l"
+#line 145 "lexpar.l"
 return DIV;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 144 "lexpar.l"
+#line 146 "lexpar.l"
 return MOD;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 146 "lexpar.l"
+#line 148 "lexpar.l"
 return INC;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 147 "lexpar.l"
+#line 149 "lexpar.l"
 return DEC;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 149 "lexpar.l"
+#line 151 "lexpar.l"
 return EQ;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 150 "lexpar.l"
+#line 152 "lexpar.l"
 return EQEQ;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 151 "lexpar.l"
+#line 153 "lexpar.l"
 return PEQ;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 152 "lexpar.l"
+#line 154 "lexpar.l"
 return MEQ;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 153 "lexpar.l"
+#line 155 "lexpar.l"
 return MUEQ;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 154 "lexpar.l"
+#line 156 "lexpar.l"
 return DEQ;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 155 "lexpar.l"
+#line 157 "lexpar.l"
 return NEQ;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 157 "lexpar.l"
+#line 159 "lexpar.l"
 return LT;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 158 "lexpar.l"
+#line 160 "lexpar.l"
 return GT;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 159 "lexpar.l"
+#line 161 "lexpar.l"
 return LE;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 160 "lexpar.l"
+#line 162 "lexpar.l"
 return GE;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 162 "lexpar.l"
+#line 164 "lexpar.l"
 return BOR;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 163 "lexpar.l"
+#line 165 "lexpar.l"
 return OR;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 164 "lexpar.l"
+#line 166 "lexpar.l"
 return BXOR;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 165 "lexpar.l"
+#line 167 "lexpar.l"
 return BAND;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 166 "lexpar.l"
+#line 168 "lexpar.l"
 return AND;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 168 "lexpar.l"
+#line 170 "lexpar.l"
 {strcpy(currid, yytext); return ID;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 169 "lexpar.l"
+#line 171 "lexpar.l"
 return NUM;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 170 "lexpar.l"
+#line 172 "lexpar.l"
 return STRING;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 172 "lexpar.l"
+#line 174 "lexpar.l"
 return yytext[0];
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 174 "lexpar.l"
+#line 176 "lexpar.l"
 ECHO;
 	YY_BREAK
-#line 1016 "lex.yy.c"
+#line 1018 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1902,6 +1904,6 @@ int main()
 	return 0;
 	}
 #endif
-#line 174 "lexpar.l"
+#line 176 "lexpar.l"
 
 

@@ -3,14 +3,20 @@
 	#include<stdio.h>
 	#include<string.h>
 	int flag = 0;
-	int curargs=0;
+	int curargs=0,tmpargs=0;
 	int nestval = 0;
-	char lastfun[105],funtype[105];
+	char lastfun[105],funtype[105],lastcallfun[105];
 	char *getcurrid();
 	char *getcurrtype();
 	void checkscope();
+	char curfuntype[105];
+	char getfirst(char *s);
+	char tmptype[105];
+	char gettype(char *s);
+
+	void checkfun(char *name,int numargs,char *type);
 	
-	void insert(char *name, char *type, int flag, int nest,int numargs);
+	void insert(char *name, char *type, int flag, int nest,int numargs,char *argtype);
 
 	void deletedata(int nest);
 %}
@@ -93,7 +99,7 @@ assignment: ID{checkscope();} EQ expr
 			| ID{checkscope();} DEQ expr
 			;
 
-declaration:type ID                         {insert(getcurrid(), getcurrtype(), 0, nestval,curargs);}     
+declaration:type ID                         {insert(getcurrid(), getcurrtype(), 0, nestval,curargs,curfuntype);}     
 			| type assignment     
 			;
 			
@@ -104,27 +110,29 @@ stmtlist:	stmt stmtlist
 			| stmt
 			;
 
-argumentlist:	argument',' argumentlist
-				| argument
+argumentlist:	argument',' {tmpargs++;} argumentlist
+				| argument {tmpargs++;}
 				;
 				
 argument:	BAND ID {checkscope();}
-			| expr
+			|ID {tmptype[tmpargs]=gettype(getcurrid());}
+			|NUM {tmptype[tmpargs]='i';}
+			|STRING {tmptype[tmpargs]='c';}
 			;
 			
-parameter:	type ID      				 {insert(getcurrid(), getcurrtype(), 0, nestval,curargs);}                   
+parameter:	type ID      				 {curfuntype[curargs]=getfirst(getcurrtype());insert(getcurrid(), getcurrtype(), 0, nestval,curargs,curfuntype);}                   
 			;
 
 paramlist: 	parameter',' {curargs++;} paramlist
 			| parameter {curargs++;}  
 			;
 
-funccall:	ID '(' {checkscope();} argumentlist ')'		
-			| ID '('')'         
+funccall:	ID '(' {printf("currid %s\n",getcurrid());strcpy(lastcallfun,getcurrid());checkscope();} argumentlist ')'{checkfun(lastcallfun,tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");}	
+			| ID '('')' {checkfun(getcurrid(),tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");}
 			;
 
-funcdef:	type ID '(' {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist ')' {insert(lastfun,funtype,1,nestval-1,curargs);curargs=0;} stmtblock  {deletedata(nestval); nestval--;} 
-			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval,curargs);curargs=0;}')' stmtblock          
+funcdef:	type ID '(' {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist ')' {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");} stmtblock  {deletedata(nestval); nestval--;} 
+			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");}')' stmtblock          
 			;
 			
 whileloop: 	WHILE '(' expr ')' stmtblock
@@ -158,6 +166,47 @@ char *getcurrid(){
 
 char *getcurrtype(){
 	return currtype;
+}
+
+char gettype(char *s){
+	int i;
+	for (i=0;i<1001;i++){
+		if(strcmp(table[i].symbol,s)==0){
+			return (table[i].type[0]);
+		}
+	}
+}
+
+char getfirst(char *s){
+	if(strcmp(s,"int")==0)
+	return 'i';
+
+	if(strcmp(s,"char")==0){
+		return 'c';
+	}
+
+	if(strcmp(s,"void")==0){
+		return 'v';
+	}
+}
+
+void checkfun(char *funname,int numargs,char *argtype){
+	int i,flag=0;
+
+	printf("Funtype %s %s %d\n",argtype, funname, numargs);
+
+	for (i=0;i<1001;i++){
+		if(strcmp(funname,table[i].symbol)==0){
+			printf("Here funtype is %s\n",table[i].symbol);
+			if(table[i].isfunc==1  && strcmp(argtype,table[i].paramtype)==0){
+				flag=1;
+			}
+		}
+	}
+
+	if(!flag){
+		printf("Semantic error at line %d\n",line);
+	}
 }
 
 void checkscope()

@@ -22,7 +22,7 @@ int main(){
     e=a/b;
     g=a&b;
     h=a*(a+b);
-    h=a*a+b*b;
+    h=a*a+b*c;
     h=fun(b);
     
 }
