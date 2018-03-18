@@ -9,6 +9,10 @@ void fu1(int a,int b){
     return a+b;
 }
 
+int fu1(int x){
+    return 1;
+}
+
 int main(char args,char arg2){
     int a;
     int b;

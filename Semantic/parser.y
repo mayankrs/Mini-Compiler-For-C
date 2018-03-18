@@ -11,6 +11,7 @@
 	char* getcurrid();
 	char* getcurrtype();
 	char* getprevid();
+	void checkfunduplicate(char *s);
 	char* getprevtype();
 	void yyerror(char *s);
 	int hash(char *s);
@@ -136,7 +137,7 @@ funccall:	ID '(' {strcpy(currfunc, getprevid());} argumentlist ')' 		{checkfunca
 			| ID '(' {checkscope(getcurrid());} ')' 							{checkfuncargs(getcurrid(), argcount, argtypes); strcpy(argtypes, " "); argcount = 0;}
 			;
 
-funcdef:	type ID '(' {strcpy(currfunc, getcurrid()); strcpy(currfunctype, getprevtype()); nestval++;} paramlist ')' {insert(currfunc, currfunctype, 1, nestval-1, paracount, paratypes); paracount = 0; strcpy(paratypes, " ");} stmtblock {deletedata(nestval); nestval--;} 
+funcdef:	type ID '(' {strcpy(currfunc, getcurrid());checkfunduplicate(getcurrid());strcpy(currfunctype, getprevtype()); nestval++;} paramlist ')' {insert(currfunc, currfunctype, 1, nestval-1, paracount, paratypes); paracount = 0; strcpy(paratypes, " ");} stmtblock {deletedata(nestval); nestval--;} 
 			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval, paracount, paratypes); paracount = 0; strcpy(paratypes, " "); nestval++;}')' stmtblock {deletedata(nestval); nestval--;}
 			;
 			
@@ -348,6 +349,19 @@ char getfirst(char*s)
 		return 'v';
 }
 
+void checkfunduplicate(char *s){
+
+	int flag=0,i;
+
+	for (i=0;i<1001;i++){
+		if(strcmp(table[i].symbol,s)==0){
+			flag=1;
+			printf("Duplicate Function Declaration of %s on line %d\n",s,line);
+		}
+	}
+
+}
+
 char gettype(char *name, int flag)
 {
 	if (flag == 1 && validfuncflag == 1)
@@ -378,5 +392,5 @@ int main()
 		printf("Parsing successful\n");
 	
 	print();
-
+}
 	
