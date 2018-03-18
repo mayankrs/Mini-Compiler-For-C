@@ -438,7 +438,7 @@ char *yytext;
 	#include<string.h>
 	int line = 1;	
 	char currtype[100];
-	char currid[100],previd[105];
+	char currid[100],previd[105],prevtype[105];
 	
 	struct hashtable
 	{
@@ -829,17 +829,17 @@ YY_RULE_SETUP
 case 6:
 YY_RULE_SETUP
 #line 131 "lexpar.l"
-{strcpy(currtype, yytext); return INT;}
+{strcpy(prevtype,currtype);strcpy(currtype, yytext); return INT;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 132 "lexpar.l"
-{strcpy(currtype, yytext); return CHAR;}
+{strcpy(prevtype,currtype);strcpy(currtype, yytext); return CHAR;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 133 "lexpar.l"
-{strcpy(currtype, yytext); return VOID;}
+{strcpy(prevtype,currtype);strcpy(currtype, yytext); return VOID;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP

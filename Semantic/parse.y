@@ -11,7 +11,9 @@
 	void checkscope();
 	char curfuntype[105];
 	char getfirst(char *s);
+	char getfuntype(char *s);
 	char *getprev();
+	char *getprevtype();
 	char tmptype[105];
 	char gettype(char *s);
 
@@ -40,7 +42,7 @@ start:		INCLUDE start
 			| INCLUDE stmtlist
 			;
 			
-type:		INT
+type:		INT     
 			| CHAR
 			| VOID
 			;
@@ -54,38 +56,41 @@ stmt:		funcdef
 			| assignment';'
 			| expr';'
 			| ';'
-			| RETURN';'
+			| RETURN';' {if(!strcmp(funtype,"void"))printf("Semantic Error:Type Mismatch \n");}
 			| CONTINUE';'
 			| BREAK';'
-			| RETURN expr';'
+			| RETURN expr';' {
+								printf("funtype::%s\n",funtype);
+								if(strcmp(getprevtype(),"void")==0)printf("Semantic Error:Type Mismatch 1\n");
+								else if($$==-1) printf("Semantic Error:Type Mismatch 2\n");
+							}
 			;
 
-expr:		expr OR expr
-			| expr AND expr
-			| expr BOR expr
-			| expr BXOR expr
-			| expr BAND expr
-			| expr EQEQ expr
-			| expr NEQ expr
-			| expr LE expr
-			| expr GE expr
-			| expr LT expr
-			| expr GT expr
-			| expr PLUS expr
-			| expr MINUS expr
-			| expr MULT expr
-			| expr MOD expr
-			| expr DIV expr
-			| MINUS expr
-			| INC expr
-			| DEC expr
-			| expr INC
-			| expr DEC
-			| LP expr RP
-			| ID                            {checkscope();}
-			| STRING
-			| NUM
-			| funccall
+expr:		expr OR expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr AND expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr BOR expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr BXOR expr	{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr BAND expr	{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr EQEQ expr	{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr NEQ expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr LE expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr GE expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr LT expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr GT expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr PLUS expr	{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr MINUS expr	{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr MULT expr    {if($1==1 && $3==1)$$=1; else $$=-1;}
+			| expr MOD expr		{if($1==$3 && $1==1)$$=$1; else $$=-1;}
+			| expr DIV expr		{if($1==1 && $3==1)$$=1; else $$=-1;}
+			| MINUS expr		{if($2==1)$$=1; else $$=-1;}
+			| INC expr			{if($2==1)$$=1;else $$=-1;}
+			| DEC expr  		{if($2==1)$$=1;else $$=-1;}
+			| expr INC			{if($1==1)$$=1;else $$=-1;}
+			| expr DEC 			{if($1==1)$$=1;else $$=-1;}
+			| LP expr RP		{if($2==1)$$=1;else $$=-1;}
+			| ID                {checkscope(); if(gettype(getcurrid())=='i'){$$=1;}else{$$=-1;}}					
+			| NUM						{$$=1;}
+			| funccall					{if(getfuntype(getcurrid())=='i' || getfuntype(getcurrid())=='c')$$=1;else $$=-1;}
 			;
 			
 expr1: 		expr
@@ -132,7 +137,7 @@ funccall:	ID LP {strcpy(lastcallfun,getprev());checkscope();} argumentlist RP{ch
 			| ID LP  {checkfun(getcurrid(),tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");} RP
 			;
 
-funcdef:	type ID LP {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist RP {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");} stmtblock  {deletedata(nestval); nestval--;} 
+funcdef:	type ID LP {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist RP {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;} stmtblock  {deletedata(nestval); nestval--;strcpy(curfuntype,"");strcpy(lastfun,"");} 
 			| type ID  LP{insert(getcurrid(), getcurrtype(), 1, nestval,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");}RP stmtblock          
 			;
 			
@@ -182,6 +187,10 @@ char *getprev(){
 	return previd;
 }
 
+char *getprevtype(){
+	return prevtype;
+}
+
 char getfirst(char *s){
 	if(strcmp(s,"int")==0)
 	return 'i';
@@ -193,6 +202,19 @@ char getfirst(char *s){
 	if(strcmp(s,"void")==0){
 		return 'v';
 	}
+}
+
+char getfuntype(char *s){
+	int flag=0,i;
+	for (i=0;i<1001;i++){
+		if(strcmp(table[i].symbol,s)==0){
+			flag=1;
+			return getfirst(table[i].type);
+		}
+	}
+
+	printf("Semantics Error at line %d:Function Not Found\n",line);
+	return 'v';
 }
 
 void checkfun(char *funname,int numargs,char *argtype){

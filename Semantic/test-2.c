@@ -5,7 +5,7 @@ int fun(int x){
     return x*x;
 }
 
-int fu1(int a,int b){
+void fu1(int a,int b){
     return a+b;
 }
 
