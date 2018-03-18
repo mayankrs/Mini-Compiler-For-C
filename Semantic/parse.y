@@ -9,6 +9,7 @@
 	char *getcurrid();
 	char *getcurrtype();
 	void checkscope();
+	int getl();
 	char curfuntype[105];
 	char getfirst(char *s);
 	char getfuntype(char *s);
@@ -56,13 +57,13 @@ stmt:		funcdef
 			| assignment';'
 			| expr';'
 			| ';'
-			| RETURN';' {if(!strcmp(funtype,"void"))printf("Semantic Error:Type Mismatch \n");}
+			| RETURN';' {if(!strcmp(funtype,"void"))printf("Semantic Error:Type Mismatch on %d\n",getl());}
 			| CONTINUE';'
 			| BREAK';'
 			| RETURN expr';' {
 								printf("funtype::%s\n",funtype);
-								if(strcmp(getprevtype(),"void")==0)printf("Semantic Error:Type Mismatch 1\n");
-								else if($$==-1) printf("Semantic Error:Type Mismatch 2\n");
+								if(strcmp(funtype,"void")==0)printf("Semantic Error:Type Mismatch on %d\n",getl());
+								else if($$==-1) printf("Semantic Error:Type Mismatch on %d\n",getl());
 							}
 			;
 
@@ -137,7 +138,7 @@ funccall:	ID LP {strcpy(lastcallfun,getprev());checkscope();} argumentlist RP{ch
 			| ID LP  {checkfun(getcurrid(),tmpargs,tmptype);tmpargs=0;strcpy(tmptype,"");} RP
 			;
 
-funcdef:	type ID LP {strcpy(lastfun,getcurrid()); strcpy(funtype,getcurrtype()); nestval++;} paramlist RP {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;} stmtblock  {deletedata(nestval); nestval--;strcpy(curfuntype,"");strcpy(lastfun,"");} 
+funcdef:	type ID LP {strcpy(lastfun,getcurrid()); strcpy(funtype,getprevtype()); nestval++;} paramlist RP {insert(lastfun,funtype,1,nestval-1,curargs,curfuntype);curargs=0;} stmtblock  {deletedata(nestval); nestval--;strcpy(curfuntype,"");strcpy(lastfun,"");} 
 			| type ID  LP{insert(getcurrid(), getcurrtype(), 1, nestval,curargs,curfuntype);curargs=0;strcpy(curfuntype,"");}RP stmtblock          
 			;
 			
@@ -215,6 +216,10 @@ char getfuntype(char *s){
 
 	printf("Semantics Error at line %d:Function Not Found\n",line);
 	return 'v';
+}
+
+int getl(){
+	return line;
 }
 
 void checkfun(char *funname,int numargs,char *argtype){

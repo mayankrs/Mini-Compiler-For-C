@@ -9,7 +9,7 @@ void fu1(int a,int b){
     return a+b;
 }
 
-int main(){
+int main(char args,char arg2){
     int a;
     int b;
     int c;
