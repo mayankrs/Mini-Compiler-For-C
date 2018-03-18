@@ -90,6 +90,7 @@ expr:		expr OR expr					{if($1==1 && $3==1)$$=1; else $$=-1;}
 			| NUM							{$$=1;}
 			| LITERAL						{$$=1;}
 			| funccall						{if(gettype(getcurrid(), 0)=='i' || gettype(getcurrid(), 1)== 'c') $$ = 1; else $$ = -1;}
+			| STRING						{$$=-1;}
 			;
 			
 expr1: 		expr
@@ -126,7 +127,7 @@ argument:	BAND ID  						{checkscope(getcurrid());}
 			| STRING 						{argtypes[argcount] = 'c';}
 			;
 			
-parameter:	type ID      				 	{paratypes[paracount] = getfirst(getcurrtype()); insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);}                   
+parameter:	type ID      				 	{if(getfirst(getcurrtype())=='v')printf("%d-invalid parameter of type void\n",linenum());paratypes[paracount] = getfirst(getcurrtype()); insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);}                   
 			;
 
 paramlist: 	parameter',' {paracount++;} paramlist
@@ -141,8 +142,8 @@ funcdef:	type ID '(' {strcpy(currfunc, getcurrid());checkfunduplicate(getcurrid(
 			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval, paracount, paratypes); paracount = 0; strcpy(paratypes, " "); nestval++;}')' stmtblock {deletedata(nestval); nestval--;}
 			;
 			
-whileloop: 	WHILE '(' expr ')' stmtblock
-			| WHILE '(' expr ')' stmt
+whileloop: 	WHILE '(' expr ')' stmtblock {if($3!=1)printf("%d :While expression is not of type INT  \n",linenum());}
+			| WHILE '(' expr ')' stmt    {if($3!=1)printf("%d :While expression is not of type INT \n",linenum());}
 			;
 
 forloop:	FOR '(' expr1 ';' expr1 ';' expr1 ')' stmtblock
@@ -150,10 +151,10 @@ forloop:	FOR '(' expr1 ';' expr1 ';' expr1 ')' stmtblock
 			;
 
 			
-ifstmt:		IF '(' expr ')' stmtblock elsestmt
-			| IF '(' expr ')' stmt elsestmt
-			| IF '(' expr ')' stmtblock
-			| IF '(' expr ')' stmt
+ifstmt:		IF '(' expr ')' stmtblock elsestmt {if($3!=1)printf("%d: IF expression is not of type INT \n",linenum());}
+			| IF '(' expr ')' stmt elsestmt   {if($3!=1)printf("%d: IF expression is not of type INT \n",linenum());}
+			| IF '(' expr ')' stmtblock			{if($3!=1)printf("%d :IF expression is not of type INT  \n",linenum());}
+			| IF '(' expr ')' stmt				{if($3!=1)printf("%d :IF expression is not of type INT \n",linenum());}
 			;
 
 elsestmt:	ELSE stmtblock
@@ -268,6 +269,8 @@ void deletedata(int nestval)
 
 void print()
 {
+	printf("\nPrinting Symbol Table\n");
+	printf("----------------------------------------\n");
 	int i = 0;
 	for (i=0;i<1001;i++)
 	{
@@ -275,6 +278,7 @@ void print()
 			continue;
 		printf("%s - %s - %d - %d - %s\n", table[i].symbol, table[i].type, table[i].isfunc, table[i].numofpara, table[i].paratypes);
 	}
+	printf("----------------------------------------\n");
 }
 
 int checkscope(char *s)
@@ -332,6 +336,10 @@ void checkfuncargs(char *name, int numofargs, char *types)
                 validfuncflag = 1;
                 break;
             }
+			if(table[i].isfunc==0){
+				printf("%d-Invalid function call\n",linenum());
+				return ;
+			}
         }
     }
 
@@ -356,7 +364,7 @@ void checkfunduplicate(char *s){
 	for (i=0;i<1001;i++){
 		if(strcmp(table[i].symbol,s)==0){
 			flag=1;
-			printf("Duplicate Function Declaration of %s on line %d\n",s,line);
+			printf("%d: Duplicate Function Declaration of %s\n",line,s);
 		}
 	}
 
