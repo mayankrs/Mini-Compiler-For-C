@@ -11,6 +11,7 @@
 	char* getcurrid();
 	char* getcurrtype();
 	char* getprevid();
+	int prevlinenum();
 	void checkfunduplicate(char *s);
 	char* getprevtype();
 	void yyerror(char *s);
@@ -19,7 +20,7 @@
 	void deletedata(int nest);
 	void print();
 	int checkscope(char* name);
-	void isduplicate(char* name, int nest);
+	int isduplicate(char* name, int nest);
 	void checkfuncargs(char* name, int numofargs, char* types);
 	char getfirst(char* s);
 	char gettype(char* name, int flag);
@@ -105,8 +106,16 @@ assignment: ID{checkscope(getcurrid());} EQ expr
 			| ID{checkscope(getcurrid());} DEQ expr
 			;
 
-declaration:type ID                         {isduplicate(getcurrid(), nestval); insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);}     
-			| type assignment     
+declaration:type ID {isduplicate(getcurrid(), nestval); insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} dec1                              
+			| type ID{if (!isduplicate(getcurrid(), nestval)) insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} EQ expr        {if ($4 == -1) printf("%d - Type mismatch\n", linenum());}           
+			| type ID{if (!isduplicate(getcurrid(), nestval)) insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} PEQ expr {if ($4 == -1) printf("%d - Type mismatch\n", linenum());}
+			| type ID{if (!isduplicate(getcurrid(), nestval)) insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} MEQ expr {if ($4 == -1) printf("%d - Type mismatch\n", linenum());}
+			| type ID{if (!isduplicate(getcurrid(), nestval)) insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} MUEQ expr {if ($4 == -1) printf("%d - Type mismatch\n", linenum());}
+			| type ID{if (!isduplicate(getcurrid(), nestval)) insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} DEQ expr {if ($4 == -1) printf("%d - Type mismatch\n", linenum());}
+			;
+
+dec1:		',' ID {isduplicate(getcurrid(), nestval); insert(getcurrid(), getcurrtype(), 0, nestval, paracount, paratypes);} dec1
+			|  
 			;
 			
 stmtblock:	'{' {nestval++;} stmtlist '}'   {deletedata(nestval); nestval--;}
@@ -121,7 +130,7 @@ argumentlist:	argument',' {argcount++;} argumentlist
 				;
 				
 argument:	BAND ID  						{checkscope(getcurrid());}
-			| ID     						{argtypes[argcount] = getfirst(getcurrtype());}
+			| ID     						{argtypes[argcount] = gettype(getcurrid(), 0);}
 			| LITERAL						{argtypes[argcount] = 'c';}
 			| NUM    						{argtypes[argcount] = 'i';}
 			| STRING 						{argtypes[argcount] = 'c';}
@@ -142,8 +151,8 @@ funcdef:	type ID '(' {strcpy(currfunc, getcurrid());checkfunduplicate(getcurrid(
 			| type ID  '('{insert(getcurrid(), getcurrtype(), 1, nestval, paracount, paratypes); paracount = 0; strcpy(paratypes, " "); nestval++;}')' stmtblock {deletedata(nestval); nestval--;}
 			;
 			
-whileloop: 	WHILE '(' expr ')' stmtblock {if($3!=1)printf("%d - While expression is not of type INT  \n",linenum());}
-			| WHILE '(' expr ')' stmt    {if($3!=1)printf("%d - While expression is not of type INT \n",linenum());}
+whileloop: 	WHILE '(' expr ')' stmtblock {if($3!=1)printf("%d - While expression is not of type INT \n", prevlinenum());}
+			| WHILE '(' expr ')' stmt    {if($3!=1)printf("%d - While expression is not of type INT \n", prevlinenum());}
 			;
 
 forloop:	FOR '(' expr1 ';' expr1 ';' expr1 ')' stmtblock
@@ -151,10 +160,10 @@ forloop:	FOR '(' expr1 ';' expr1 ';' expr1 ')' stmtblock
 			;
 
 			
-ifstmt:		IF '(' expr ')' stmtblock elsestmt 	{if($3!=1)printf("%d - IF expression is not of type INT \n",linenum());}
-			| IF '(' expr ')' stmt elsestmt   	{if($3!=1)printf("%d - IF expression is not of type INT \n",linenum());}
-			| IF '(' expr ')' stmtblock			{if($3!=1)printf("%d - IF expression is not of type INT  \n",linenum());}
-			| IF '(' expr ')' stmt				{if($3!=1)printf("%d - IF expression is not of type INT \n",linenum());}
+ifstmt:		IF '(' expr ')' stmtblock elsestmt 	{if($3!=1)printf("%d - IF expression is not of type INT \n", prevlinenum());}
+			| IF '(' expr ')' stmt elsestmt   	{if($3!=1)printf("%d - IF expression is not of type INT \n", prevlinenum());}
+			| IF '(' expr ')' stmtblock			{if($3!=1)printf("%d - IF expression is not of type INT \n", prevlinenum());}
+			| IF '(' expr ')' stmt				{if($3!=1)printf("%d - IF expression is not of type INT \n", prevlinenum());}
 			;
 
 elsestmt:	ELSE stmtblock
@@ -187,6 +196,11 @@ char* getprevid()
 char* getprevtype()
 { 
 	return prevtype;
+}
+
+int prevlinenum()
+{
+	return prevline;
 }
 
 void yyerror(char *s)
@@ -269,16 +283,18 @@ void deletedata(int nestval)
 
 void print()
 {
-	printf("\nPrinting Symbol Table\n");
-	printf("----------------------------------------\n");
+	printf("\n\t\tSYMBOL TABLE\n");
+	printf("------------------------------------------\n");
+	printf("Symbol \t Type \t Func \t Numpara Paratypes\t Nestvalue\n");
+	printf("------------------------------------------\n");
 	int i = 0;
 	for (i=0;i<1001;i++)
 	{
 		if (table[i].len == 0)
 			continue;
-		printf("%s - %s - %d - %d - %s\n", table[i].symbol, table[i].type, table[i].isfunc, table[i].numofpara, table[i].paratypes);
+		printf("%s \t %s \t %d \t %d \t %s \t\t %d\n", table[i].symbol, table[i].type, table[i].isfunc, table[i].numofpara, table[i].paratypes, table[i].nesting);
 	}
-	printf("----------------------------------------\n");
+	printf("------------------------------------------\n");
 }
 
 int checkscope(char *s)
@@ -301,13 +317,13 @@ int checkscope(char *s)
     return flag;
 }
 
-void isduplicate(char *s, int nest)
+int isduplicate(char *s, int nest)
 {
 	int val = hash(s);
 	if (strcmp(table[val].symbol, s) == 0 && table[val].nesting == nest)
 	{
 		printf("%d - Duplicate declaration of %s\n", linenum(), s);
-		return;
+		return 1;
 	}
 	int i;
 	for (i=0;i<1002;i++)
@@ -315,9 +331,10 @@ void isduplicate(char *s, int nest)
 		if (strcmp(table[i].symbol, s) == 0 && table[i].nesting == nest)
 		{
 			printf("%d - Duplicate declaration of %s\n", linenum(), s);
-			return;
+			return 1;
 		}
 	}
+	return 0;
 }
 
 void checkfuncargs(char *name, int numofargs, char *types)
