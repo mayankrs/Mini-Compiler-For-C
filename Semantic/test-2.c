@@ -1,53 +1,22 @@
 #include<stdio.h>
 
-int t;
-
-int fun(int x){
-    int y;
-    return x*x;
-}
-
-void fu1(int a,int b){
-    return a+b;
-}
-
-int fu1(int x){
-    return 1;
-}
-
 int tmp(void a){
-    return t;
+    a = a + b;
+    return a;
 }
 
-int main(char args,char arg2){
+void main(){
     int a;
-    int b;
-    int c;
-    int d;
-    int e;
-    int f;
-    int g;
-    int h;
-    int a=4;
-    a=2;
-    b=5;
-    y=2;
+    int a = 4;
+    b = 5;
     if("ab"){
-        a++;
+        int c = 5;
     }
-    c=a+b;
-    d=a*b;
-    e=a/b;
-    g=a&b;
-    h=a*(a+b);
-    h=a*a+b*c;
-    fun(d);
-    fu1(a,b);
-    a=t();
-    fu1(a,a,a);
+    h = a * a + b * c;
+    j = tmp(d);
 
-    while(a>4){
+    while (a >= 4){
         b++;
+        a--;
     }
-    
 }
